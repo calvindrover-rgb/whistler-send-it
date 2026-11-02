@@ -39,7 +39,7 @@ h1{margin:4px 0;color:#ffd23f;font-size:clamp(28px,6vw,48px)}h2{margin:4px 0;col
 <div class="ov" id="title"><div class="panel"><h1>WHISTLER SEND IT 3D</h1><div style="font-size:20px;font-weight:bold">starring Sarah "Broke Back" Beal</div>
 <p style="color:#ddd">Ride the chairlift, pick a real Whistler Bike Park trail, and send it, all from her point of view.</p>
 <p>&#8593; / W pedal &nbsp; &#8595; / S brake &nbsp; &#8592; &#8594; / A D steer<br>SPACE pump / jump &nbsp; In the air: &#8593; &#8595; flip (front/back)<br>Land with the bike matching the slope or you crash!</p>
-<div class="btn" id="go">Ride the Fitzsimmons Express</div></div></div>
+<div class="btn" id="go">Ride the Fitzsimmons Express</div><a class="btn o" href="aline-real.html" style="text-decoration:none">Ride A-Line for real (Calvin's footage)</a></div></div>
 <div class="ov" id="select"><h2 style="text-shadow:0 0 6px #000">TOP OF THE LIFT: PICK YOUR TRAIL</h2><div id="seldesc" style="text-shadow:0 0 6px #000;margin-bottom:6px"></div><div id="grid"></div></div>
 <div class="ov" id="done"><div class="panel" id="donep"></div></div>
 <div class="ov" id="crashov" style="pointer-events:none"><div class="panel" style="pointer-events:auto"><h2 id="crasht"></h2><div class="btn o" id="crep">Watch crash replay</div><div class="btn b" id="ccont">Keep riding</div></div></div>
@@ -73,8 +73,8 @@ const TRAILS=[
   desc:'Flowy berms, rollers & first little tables',feats:['roll','berm','table','berm','roll','table','berm','table','roll','berm','table','berm','roll','table']},
  {id:'crank',name:'Crank It Up',diff:'blue',type:'Freeride',zone:'Fitzsimmons',lifts:['Fitzsimmons Express'],grade:0.16,size:0.75,
   desc:'Blue flow/jump trail: tables, berms, wallrides, small drops',feats:['table','berm','table','wall','table','roll','table','berm','wall','drop','table','berm','table','wall','table','table']},
- {id:'aline',name:'A-Line',diff:'black',type:'Freeride',zone:'Fitzsimmons',lifts:['Fitzsimmons Express'],grade:0.18,size:1,
-  desc:'The iconic jump line: tabletop after tabletop + the 40-footer',feats:['table','table','berm','table','table','table','berm','table','table','drop','table','berm','table','table','table','berm','table','table','big']},
+ {id:'aline',custom:true,look:'aline',name:'A-Line',diff:'black',type:'Freeride',zone:'Fitzsimmons',lifts:['Fitzsimmons Express'],grade:0.18,size:1,
+  desc:'Rebuilt from Calvin\'s POV: ~35 tables, step-downs, wooden drops & bridges, 20+ berms, the Moonbooter into the village',feats:['table','table','berm','table','table','table','berm','table','table','drop','table','berm','table','table','table','berm','table','table','big']},
  {id:'rutabaga',name:"Rippin' Rutabaga",diff:'black',type:'Freeride',zone:'Fitzsimmons',lifts:['Fitzsimmons Express'],grade:0.22,size:1.05,sign:true,
   desc:'Advanced high-speed jump trail off Dirt Merchant',feats:['table','roll','table','berm','table','table','drop','berm','table','table','roll','table','berm','table','table']},
  {id:'merch',name:'Dirt Merchant',diff:'pro',type:'Freeride',zone:'Fitzsimmons',lifts:['Fitzsimmons Express'],grade:0.2,size:1.25,
@@ -85,7 +85,7 @@ const TRAILS=[
   desc:'Alpine singletrack from 2182 m: rock slabs & loose steeps',feats:['rocks','steep','roots','rocks','drop','steep','rocks','roll','rocks','steep','drop','rocks','roots','steep','rocks']},
 ];
 let TR=TRAILS[4];
-function build(tr){
+function build(tr){if(tr.custom){buildCustom(tr);return;}
   TR=tr;const R=rng(7+tr.id.length*97+tr.name.charCodeAt(1));deco.length=0;checkpoints.length=0;checkpoints.push(0);
   let y=300;const pts=[];const push=v=>pts.push(v);const S=tr.size,Gd=tr.grade;
   const slope=(len,g)=>{for(let i=0;i<len/STEP;i++){y+=g*STEP;push(y);}};
@@ -183,6 +183,53 @@ mb.addEventListener('touchstart',e=>{e.preventDefault();e.stopPropagation();audi
 mb.addEventListener('mousedown',e=>{e.stopPropagation();audioUnlock();setMute(!SFX.muted);});
 ['touchstart','touchend','mousedown','keydown'].forEach(ev=>addEventListener(ev,audioUnlock,{capture:true,passive:true}));
 
+// ===== A-Line, rebuilt from Calvin's POV footage log (feature order preserved) =====
+const ALINE_SEQ=`sign drop-in steep:L bridgeO straight chute rollover straight table:3+tower netting:L stepdownW:2 straight table:4 steep stepdown table table berm:L straight bumps berm:R roller table bermT:L stepdown table edgeroots table straight table:2 berm:L table table retwall:R berm:R berm:L table straight table:2 straight bridge stepup clearing CP
+ drop-in table straight table straight table bermB:R table roller table:2 table:2 berm:R berm:L roller berm:R straight berm:L berm:R berm:L steep table straight wdrop:2 bumps berm:R+overpass table straight table bermB:L table berm:R table:2 berm:L straight table flat pedal berm:R gravel CP
+ drop-in steep table:2 berm:L table:2 berm:R straight table straight berm:L table stepdown berm:R straight table:2 straight table wdrop straight table moon base berm:L roller roller roller caution pave`;
+function buildCustom(tr){
+  TR=tr;const R=rng(1234);deco.length=0;checkpoints.length=0;checkpoints.push(0);
+  let y=300;const pts=[];const push=v=>pts.push(v);const BL=73;
+  const slope=(len,g)=>{for(let i=0;i<len/STEP;i++){y+=g*STEP;push(y);}};
+  const curve=(len,dy,f)=>{const y0=y;for(let i=1;i<=len/STEP;i++){const t=i/(len/STEP);y=y0+dy*f(t);push(y);}};
+  const bumpy=(len,g,a)=>{for(let i=0;i<len/STEP;i++){y+=g*STEP;push(y+Math.sin(i*1.9)*a);}};
+  const X=()=>pts.length*STEP;let pendTower=false,pendOver=false;
+  const table=L=>{const h=18+L*16;const x0=X();curve(100+L*12,-h,t=>t*t);const top=X();slope(L*BL*0.75,0);curve(150+L*22,h+45+L*6,t=>(1-Math.cos(Math.PI*t))/2);
+    if(pendTower){deco.push({t:'tower',x:top+L*BL*0.37});pendTower=false;}return x0;};
+  slope(260,0.03);deco.push({t:'sign',x:180});
+  for(const raw of ALINE_SEQ.split(/\s+/)){if(!raw)continue;const [tok0,extra]=raw.split('+');const [tok,arg]=tok0.split(':');
+    if(extra=='tower')pendTower=true;if(extra=='overpass')pendOver=true;
+    const gap=['straight','flat','pedal','CP','clearing','gravel','base','caution','pave','sign','retwall','netting','edgeroots'].includes(tok)?0:40+R()*50;slope(gap,0.16);
+    switch(tok){
+      case 'drop-in':curve(120,40,t=>t*t);break;
+      case 'steep':slope(220,0.42);break;
+      case 'chute':curve(80,10,t=>t*t);slope(160,0.6);curve(80,20,t=>Math.sin(t*Math.PI/2));break;
+      case 'bridgeO':case 'bridge':{const x0=X();slope(260,0.05);deco.push({t:'bridge',x:x0,len:260,orange:tok=='bridgeO'});break;}
+      case 'rollover':{const x0=X();const y0=y;for(let k=0;k<160/STEP;k++){y=y0+k*STEP*0.1;push(y-Math.sin(k*STEP/160*Math.PI)*22);}deco.push({t:'bridge',x:x0,len:160,arch:1});break;}
+      case 'straight':slope(140+R()*80,0.15);break;
+      case 'table':table(+arg||(1.6+R()*0.6));break;
+      case 'moon':{const x0=X();table(4.6);deco.push({t:'label',x:x0,s:'THE MOONBOOTER'});deco.push({t:'forestEnd',x:X()-120});break;}
+      case 'netting':deco.push({t:'netting',x:X()-200,len:600,side:arg=='L'?-1:1});slope(200,0.1);break;
+      case 'stepdownW':case 'wdrop':{slope(70,0.02);const x0=X();curve(14,(+arg||1.5)*40,t=>t);slope(200,0.42);deco.push({t:'wdrop',x:x0-80,len:94});break;}
+      case 'stepdown':curve(90,-30,t=>t*t);curve(60,140,t=>t*t);slope(150,0.38);break;
+      case 'stepup':{curve(110,-55,t=>t*t);curve(40,35,t=>t);curve(26,-60,t=>t);slope(150,0);curve(140,50,t=>(1-Math.cos(Math.PI*t))/2);deco.push({t:'label',x:X()-300,s:'STEP-UP'});break;}
+      case 'roller':{const y0=y;for(let k=0;k<180/STEP;k++){y=y0+k*STEP*0.12;push(y-Math.sin(k*STEP/180*Math.PI)**2*24);}break;}
+      case 'berm':case 'bermT':case 'bermB':{const len=tok=='bermT'?200:tok=='bermB'?380:280;const d={t:'berm',x:X(),len,dir:arg=='L'?-1:1,tight:tok=='bermT'?1:tok=='bermB'?0.7:1};deco.push(d);
+        if(pendOver){deco.push({t:'overpass',x:X()+len/2});pendOver=false;}curve(len,len*0.1,t=>t);break;}
+      case 'bumps':bumpy(320,0.3,2.2);break;
+      case 'edgeroots':{const x0=X();slope(260,0.14);for(let k=0;k<10;k++)deco.push({t:'edgeroot',x:x0+k*26,side:k%2?1:-1});break;}
+      case 'retwall':deco.push({t:'retwall',x:X(),len:520,side:1});slope(560,0.13);break;
+      case 'clearing':deco.push({t:'clearing',x:X(),len:400});slope(400,0.04);break;
+      case 'flat':slope(500,0.04);break;
+      case 'pedal':slope(260,0.03);break;
+      case 'gravel':slope(80,0.03);deco.push({t:'gravel',x:X()});slope(200,0.01);break;
+      case 'CP':checkpoints.push(X());deco.push({t:'flag',x:X()});slope(60,0.05);break;
+      case 'base':deco.push({t:'base',x:X()});slope(120,0.06);break;
+      case 'caution':deco.push({t:'caution',x:X()});slope(260,0.02);break;
+      case 'pave':deco.push({t:'pave',x:X()});slope(120,0.01);break;
+    }}
+  FINISH=X();deco.push({t:'finish',x:FINISH});slope(900,0.01);ground=pts;
+}
 // ================= 3D world =================
 const M=1/40; // metres per px
 const cv=$('gl');
@@ -193,17 +240,18 @@ const scene=new THREE.Scene();const SKY=new THREE.Color('#9cc8ea');scene.backgro
 const camera=new THREE.PerspectiveCamera(72,1,0.05,3000);scene.add(camera);
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,200));resize();
-scene.add(new THREE.HemisphereLight(0xdff2ff,0x3a5a2a,1.6));const sun=new THREE.DirectionalLight(0xfff3d0,1.6);sun.position.set(80,150,40);scene.add(sun);
+const hemi=new THREE.HemisphereLight(0xdff2ff,0x3a5a2a,1.6);scene.add(hemi);const sun=new THREE.DirectionalLight(0xfff3d0,1.6);sun.position.set(80,150,40);scene.add(sun);
 const lam=c=>new THREE.MeshLambertMaterial({color:c});
 const MAT={dirt:lam(0x8b5e3c),trunk:lam(0x4a3020),pine:lam(0x1f5a36),pine2:lam(0x2f6d45),rock:new THREE.MeshLambertMaterial({color:0x8a8a8a,flatShading:true}),root:lam(0x4a2e18),
   red:lam(0xe0442a),black:lam(0x161616),navy:lam(0x1d2a44),grey:lam(0x666666),silver:lam(0xc3c9cf),brown:lam(0x6b4423),glove:lam(0x22252b),white:lam(0xffffff),yellow:lam(0xf5d90a),steel:lam(0x555b60)};
 const faceTex=new THREE.CanvasTexture((()=>{const c=document.createElement('canvas');c.width=180;c.height=240;c.getContext('2d').drawImage(head,0,0,180,240);return c;})());faceTex.colorSpace=THREE.SRGBColorSpace;
 // shared instanced tree geometry
 const coneG=new THREE.ConeGeometry(1,1,7);coneG.translate(0,0.5,0);const trunkG=new THREE.CylinderGeometry(0.12,0.16,1,5);trunkG.translate(0,0.5,0);
-function makeTrees(list){const g=new THREE.Group();const n=list.length;const c1=new THREE.InstancedMesh(coneG,MAT.pine,n),c2=new THREE.InstancedMesh(coneG,MAT.pine2,n),tr=new THREE.InstancedMesh(trunkG,MAT.trunk,n);
+const DARK={a:lam(0x1b3b27),b:lam(0x24492f),t:lam(0x5b4733)};
+function makeTrees(list,dk){const g=new THREE.Group();const n=list.length;const c1=new THREE.InstancedMesh(coneG,dk?DARK.a:MAT.pine,n),c2=new THREE.InstancedMesh(coneG,dk?DARK.b:MAT.pine2,n),tr=new THREE.InstancedMesh(trunkG,dk?DARK.t:MAT.trunk,n);const w=dk?0.6:1;
   const m=new THREE.Matrix4(),q=new THREE.Quaternion(),s=new THREE.Vector3(),p=new THREE.Vector3();
-  list.forEach((t,i)=>{const h=t.h;p.set(t.x,t.y+h*0.18,t.z);s.set(h*0.28,h*0.65,h*0.28);m.compose(p,q,s);c1.setMatrixAt(i,m);
-    p.set(t.x,t.y+h*0.45,t.z);s.set(h*0.2,h*0.5,h*0.2);m.compose(p,q,s);c2.setMatrixAt(i,m);p.set(t.x,t.y,t.z);s.set(1,h*0.25,1);m.compose(p,q,s);tr.setMatrixAt(i,m);});
+  list.forEach((t,i)=>{const h=t.h;p.set(t.x,t.y+h*(dk?0.3:0.18),t.z);s.set(h*0.28*w,h*(dk?0.55:0.65),h*0.28*w);m.compose(p,q,s);c1.setMatrixAt(i,m);
+    p.set(t.x,t.y+h*(dk?0.55:0.45),t.z);s.set(h*0.2*w,h*0.45,h*0.2*w);m.compose(p,q,s);c2.setMatrixAt(i,m);p.set(t.x,t.y,t.z);s.set(dk?1.4:1,h*(dk?0.45:0.25),dk?1.4:1);m.compose(p,q,s);tr.setMatrixAt(i,m);});
   g.add(c1,c2,tr);return g;}
 function texFrom(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const old=ctx;ctx=c.getContext('2d');draw(ctx);ctx=old;const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
 // mountains backdrop (follows camera horizontally)
@@ -211,6 +259,8 @@ const mtns=new THREE.Group();scene.add(mtns);
 {const rock=new THREE.MeshLambertMaterial({color:0x7d8fa8,flatShading:true,fog:false}),snow=new THREE.MeshLambertMaterial({color:0xf4f8ff,flatShading:true,fog:false});const R=rng(5);
  for(let i=0;i<16;i++){const a=i/16*Math.PI*2+R()*0.3,d=1400+R()*500,h=420+R()*500,r=380+R()*300;const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,6+(i%3)),rock);m.position.set(Math.cos(a)*d,h/2-260,Math.sin(a)*d);m.rotation.y=R()*3;mtns.add(m);
   const s=new THREE.Mesh(new THREE.ConeGeometry(r*0.36,h*0.36,6+(i%3)),snow);s.position.set(m.position.x,h-260-h*0.18+1,m.position.z);s.rotation.y=m.rotation.y;mtns.add(s);}}
+{const cm=new THREE.MeshBasicMaterial({color:0xffffff,fog:false,transparent:true,opacity:0.92});const sg=new THREE.SphereGeometry(1,8,6);const R=rng(11);
+ for(let i=0;i<14;i++){const a=R()*Math.PI*2,dd=700+R()*600,cx=Math.cos(a)*dd,cz=Math.sin(a)*dd,cy=260+R()*200;for(let k=0;k<5;k++){const m=new THREE.Mesh(sg,cm);const s=40+R()*50;m.scale.set(s*1.6,s*0.6,s);m.position.set(cx+(k-2)*s*1.1,cy+R()*15,cz+(R()-0.5)*s);mtns.add(m);}}}
 // ================= Trail build =================
 let trail=null; // {px,pz,th,bank,hs,group}
 function buildTrail3D(tr){
@@ -218,28 +268,32 @@ function buildTrail3D(tr){
   build(tr);const N=ground.length;const R=rng(99+tr.id.length);
   // curvature from berms/walls + meander
   const kap=new Float32Array(N),bank=new Float32Array(N);let dir=1;
-  for(const d of deco)if(d.t=='berm'||d.t=='wall'){const i0=Math.floor(d.x/STEP),n=Math.floor(d.len/STEP);const turn=(d.t=="wall"?0.8:0.9)*dir;const bk=(d.t=='wall'?0.9:0.5);
-    for(let k=0;k<n&&i0+k<N;k++){const w=Math.sin(Math.PI*k/n);kap[i0+k]+=turn/(d.len*M)*w*Math.PI/2;bank[i0+k]=Math.max(bank[i0+k],bk*Math.min(1,w*1.6))*dir;}d.dir=dir;dir=-dir;}
+  for(const d of deco)if(d.t=='berm'||d.t=='wall'){const i0=Math.floor(d.x/STEP),n=Math.floor(d.len/STEP);if(d.dir)dir=d.dir;const turn=(d.t=="wall"?0.8:d.tight?(d.tight>=1?(d.len<=200?1.3:1.0):1.15):0.9)*dir;const bk=(d.t=='wall'?0.9:d.tight?0.6:0.5);
+    for(let k=0;k<n&&i0+k<N;k++){const w=Math.sin(Math.PI*k/n);kap[i0+k]+=turn/(d.len*M)*w*Math.PI/2;bank[i0+k]=dir*Math.max(Math.abs(bank[i0+k]),bk*Math.min(1,w*1.6));}d.dir=dir;dir=-dir;}
   for(let i=0;i<N;i++)kap[i]+=Math.sin(i*STEP*M/37)*0.012+Math.sin(i*STEP*M/13+1)*0.006;
   const px=new Float32Array(N),pz=new Float32Array(N),th=new Float32Array(N);let x=0,z=0,a=0;
   for(let i=0;i<N;i++){px[i]=x;pz[i]=z;th[i]=a;a+=kap[i]*STEP*M;x+=Math.cos(a)*STEP*M;z+=Math.sin(a)*STEP*M;}
   const hs=new Float32Array(N);{const w=40;let acc=0;const P=i=>ground[Math.max(0,Math.min(N-1,i))];for(let i=-w;i<=w;i++)acc+=P(i);for(let i=0;i<N;i++){hs[i]=Math.max(acc/(2*w+1),Math.min(ground[i],acc/(2*w+1)))+6;acc+=P(i+w+1)-P(i-w);}}
   // terrain ribbon
   const offs=[-60,-25,-10,-5,-3.2,-2.2,-1,0,1,2.2,3.2,5,10,25,60],C=offs.length,stride=3;const rows=Math.floor(N/stride);
-  const pos=new Float32Array(rows*C*3),col=new Float32Array(rows*C*3),idx=[];const cD=new THREE.Color(0x8b5e3c),cD2=new THREE.Color(0x6e4a2e),cG=new THREE.Color(0x3d6b3a),cG2=new THREE.Color(0x54803f);
+  const pos=new Float32Array(rows*C*3),col=new Float32Array(rows*C*3),idx=[];const AL=tr.look=='aline';const cD=new THREE.Color(AL?0xb59a6c:0x8b5e3c),cD2=new THREE.Color(AL?0xa58a5e:0x6e4a2e),cG=new THREE.Color(AL?0x3c4a2a:0x3d6b3a),cG2=new THREE.Color(AL?0x4d5a33:0x54803f);const baseX=(deco.find(d=>d.t=='base')||{x:1e9}).x,paveX=(deco.find(d=>d.t=='pave')||{x:1e9}).x,gravX=deco.filter(d=>d.t=='gravel').map(d=>d.x);const cPave=new THREE.Color(0x9a9690),cOpen=new THREE.Color(0x9c8a66),cGrav=new THREE.Color(0x8d8a82),tmpC=new THREE.Color();
   for(let r=0;r<rows;r++){const i=r*stride;const t=th[i],rx=-Math.sin(t),rz=Math.cos(t);
     for(let c=0;c<C;c++){const o=offs[c],ao=Math.abs(o);let y;const yt=-ground[i]*M,yb=-hs[i]*M;
       const bk=bank[i];const by=ao<=3.2?-o*Math.sin(Math.abs(bk))*Math.sign(bk)*(ao/3.2)*1.4:-o*Math.sign(bk)*Math.sin(Math.abs(bk))*1.4*Math.max(0,1-(ao-3.2)/3);
       if(ao<=3.2)y=yt+Math.max(0,by);else if(ao<=10){const f=(ao-3.2)/6.8;y=(yt+Math.max(0,by))*(1-f)+yb*f;}else y=yb+(ao>20?(R()-0.3)*3+ao*0.05:0);
       if(ao<=3.2&&bk!==0)y=yt+Math.max(0,-o*Math.sign(bk))*Math.tan(Math.abs(bk))*0.8;
       const k=(r*C+c)*3;pos[k]=px[i]+rx*o;pos[k+1]=y;pos[k+2]=pz[i]+rz*o;
-      const cc=ao<=2.2?(r%2?cD:cD2):ao<=3.2?cD2:(c%2?cG:cG2);col[k]=cc.r;col[k+1]=cc.g;col[k+2]=cc.b;}
+      const sx=i*STEP;let cc=ao<=2.2?(r%2?cD:cD2):ao<=3.2?cD2:(c%2?cG:cG2);
+      if(AL){if(sx>baseX&&ao<=25)cc=sx>paveX?cPave:cOpen;if(gravX.some(g=>Math.abs(sx-g)<240)&&ao>3.2)cc=cGrav;}
+      let dap=1;if(AL&&sx<baseX){dap=0.72+0.5*Math.max(0,Math.sin(r*0.37+c*1.7)*Math.sin(r*0.11+c*0.5));}
+      col[k]=cc.r*dap;col[k+1]=cc.g*dap;col[k+2]=cc.b*dap;}
     if(r<rows-1)for(let c=0;c<C-1;c++){const a0=r*C+c,b0=a0+C;idx.push(a0,b0,a0+1,a0+1,b0,b0+1);}}
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('color',new THREE.BufferAttribute(col,3));geo.setIndex(idx);geo.computeVertexNormals();
   const group=new THREE.Group();group.add(new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide})));
   // trees
-  const trees=[];for(let i=0;i<N;i+=Math.floor(3/(STEP*M))){for(const side of[-1,1]){if(R()<0.75){const o=side*(5+R()*50),t=th[i];trees.push({x:px[i]-Math.sin(t)*o,z:pz[i]+Math.cos(t)*o,y:-hs[i]*M-0.3,h:7+R()*10});}}}
-  group.add(makeTrees(trees));
+  const trees=[];for(let i=0;i<N;i+=Math.floor(3/(STEP*M))){for(const side of[-1,1]){if(R()<0.75){const o=side*(5+R()*50),t=th[i];if(AL&&i*STEP>baseX-200)continue;trees.push({x:px[i]-Math.sin(t)*o,z:pz[i]+Math.cos(t)*o,y:-hs[i]*M-0.3,h:AL?18+R()*16:7+R()*10});if(AL&&R()<0.8){const o2=side*(3.8+R()*8);trees.push({x:px[i]-Math.sin(t)*o2,z:pz[i]+Math.cos(t)*o2,y:-hs[i]*M-0.3,h:20+R()*14});}}}}
+  group.add(makeTrees(trees,AL));
+  if(AL)alineDeco(group,tr,{px,pz,th,hs,N},R);
   // rocks & roots instanced
   const rk=deco.filter(d=>d.t=='rock'),rt=deco.filter(d=>d.t=='root');const m4=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler(),s=new THREE.Vector3(),p=new THREE.Vector3();
   const rocksIM=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1,0),MAT.rock,Math.max(1,rk.length*2));let ri=0;
@@ -262,6 +316,42 @@ function buildTrail3D(tr){
 function tpos(sx,u,out){const N=trail.N;const fi=Math.max(0,Math.min(N-1.001,sx/STEP)),i=Math.floor(fi),f=fi-i;const j=Math.min(N-1,i+1);
   const t=trail.th[i]*(1-f)+trail.th[j]*f;const x=trail.px[i]*(1-f)+trail.px[j]*f,z=trail.pz[i]*(1-f)+trail.pz[j]*f;const bk=trail.bank[i]*(1-f)+trail.bank[j]*f;
   out.x=x-Math.sin(t)*u;out.z=z+Math.cos(t)*u;out.th=t;out.bank=bk;out.lift=bk?Math.max(0,-u*Math.sign(bk))*Math.tan(Math.abs(bk))*0.8:0;return out;}
+
+// ===== A-Line specific set dressing =====
+const WOOD=lam(0x9c7a4f),WOOD2=lam(0x7c5d38),ORANGE=new THREE.MeshLambertMaterial({color:0xff7a1a,side:THREE.DoubleSide,transparent:true,opacity:0.85}),METAL=lam(0x8c9298);
+function alineDeco(group,tr,T,R){const {px,pz,th,N}=T;
+  const at=(x,o,h)=>{const i=Math.max(0,Math.min(N-1,Math.floor(x/STEP))),t=th[i];return [px[i]-Math.sin(t)*o,-ground[i]*M+h,pz[i]+Math.cos(t)*o,t];};
+  const box=(w,h,dp,mat,x,o,hh,rotY=0)=>{const[a,b,c,t]=at(x,o,hh);const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,dp),mat);m.position.set(a,b,c);m.rotation.y=-t+rotY;group.add(m);return m;};
+  const along=(x0,len,o,h,ht,mat,step=40)=>{for(let x=x0;x<x0+len;x+=step)box(step*M+0.02,ht,0.12,mat,x+step/2,o,h);};
+  for(const d of deco){
+    if(d.t=='bridge'){for(let x=d.x;x<d.x+d.len;x+=8)box(8*M+0.01,0.12,2.6,(x/8)%2?WOOD:WOOD2,x+4,0,0.0);
+      for(const o of[-1.35,1.35]){along(d.x,d.len,o,0.5,0.1,WOOD,40);if(d.orange)along(d.x,d.len,o,0.35,0.6,lam(0xff6a10),40);
+        for(let x=d.x;x<=d.x+d.len;x+=60)box(0.12,0.9,0.12,WOOD2,x,o,0.25);}}
+    if(d.t=='wdrop'){for(let x=d.x;x<d.x+d.len;x+=8)box(8*M+0.01,0.1,2.6,(x/8)%2?WOOD:WOOD2,x+4,0,-0.02);const[a,b,c,t]=at(d.x+d.len,0,0);const f=new THREE.Mesh(new THREE.BoxGeometry(0.2,1.8,2.6),WOOD2);f.position.set(a+Math.cos(t)*0.1,b-0.9,c+Math.sin(t)*0.1);f.rotation.y=-t;group.add(f);}
+    if(d.t=='tower'){const[a,b,c,t]=at(d.x,0,0);const g=new THREE.Group();g.position.set(a,b,c);g.rotation.y=-t;
+      const pole=new THREE.Mesh(new THREE.BoxGeometry(0.7,22,0.7),METAL);pole.position.set(0,11-2,5.2);g.add(pole);const pole2=pole.clone();pole2.position.z=-5.2;g.add(pole2);
+      const arm=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.6,13),METAL);arm.position.set(0,19,0);g.add(arm);
+      for(const z of[-4.5,4.5]){const sh=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.3,0.4),METAL);sh.position.set(0,19.5,z);g.add(sh);const cab=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,400,4),MAT.black);cab.rotation.z=Math.PI/2-0.25;cab.position.set(0,19.9,z);g.add(cab);}
+      group.add(g);}
+    if(d.t=='netting'){for(let x=d.x;x<d.x+d.len;x+=40){box(40*M,1.3,0.05,ORANGE,x+20,d.side*3.6,0.65);box(0.08,1.5,0.08,METAL,x,d.side*3.6,0.75);}}
+    if(d.t=='retwall'){for(let x=d.x;x<d.x+d.len;x+=30){for(let k=0;k<4;k++)box(30*M+0.02,0.3,0.25,k%2?WOOD:WOOD2,x+15,d.side*3.5,0.15+k*0.32);}}
+    if(d.t=='overpass'){const[a,b,c,t]=at(d.x,0,5);const g=new THREE.Group();g.position.set(a,b,c);g.rotation.y=-t;const deck=new THREE.Mesh(new THREE.BoxGeometry(3,0.4,16),WOOD);g.add(deck);
+      for(const z of[-7,7])for(const x of[-1.2,1.2]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.35,6,0.35),WOOD2);l.position.set(x,-3,z);g.add(l);}for(const x of[-1.4,1.4]){const r=new THREE.Mesh(new THREE.BoxGeometry(0.12,1,16),WOOD2);r.position.set(x,0.7,0);g.add(r);}group.add(g);}
+    if(d.t=='edgeroot'){const[a,b,c,t]=at(d.x,d.side*2.4,0.02);const m=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.09,1.6,5),MAT.root);m.position.set(a,b,c);m.rotation.set(0,-t+R()*0.8,Math.PI/2,'YXZ');group.add(m);}
+    if(d.t=='gravel'){const[a,b,c,t]=at(d.x,0,0.03);const m=new THREE.Mesh(new THREE.PlaneGeometry(9,120),lam(0x8d8a82));m.rotation.x=-Math.PI/2;m.position.set(a,b,c);m.rotation.z=t;group.add(m);}
+    if(d.t=='caution'){for(let k=0;k<4;k++){const o=(k%2?1:-1)*(4+k*0.5);const x=d.x+k*70;box(0.1,1.6,0.1,METAL,x,o,0.8);const s=box(0.05,0.8,0.8,lam(0xffd400),x,o,1.8);s.rotation.y+=Math.PI/2;s.rotation.z=Math.PI/4;}}
+    if(d.t=='base'){const cols=[0xd23a3a,0x2f6fd6,0xf2c12e,0x2aa84a,0xffffff,0x222222,0xff8a1a,0x9b59b6];const n=70;
+      const body=new THREE.InstancedMesh(new THREE.CylinderGeometry(0.22,0.25,1.2,6),new THREE.MeshLambertMaterial({color:0xffffff}),n),hd=new THREE.InstancedMesh(new THREE.SphereGeometry(0.16,6,5),lam(0xe0b48c),n);
+      const m4=new THREE.Matrix4(),q=new THREE.Quaternion(),s1=new THREE.Vector3(1,1,1),p=new THREE.Vector3(),c=new THREE.Color();
+      for(let k=0;k<n;k++){const x=d.x+400+R()*(FINISH-d.x-300),o=(R()<0.5?-1:1)*(6+R()*9);const[a,b,cz]=at(x,o,0);p.set(a,b+0.6,cz);m4.compose(p,q,s1);body.setMatrixAt(k,m4);body.setColorAt(k,c.setHex(cols[k%cols.length]));p.y+=0.78;m4.compose(p,q,s1);hd.setMatrixAt(k,m4);}
+      group.add(body,hd);
+      // lift corrals (fences) & buildings & lift station
+      for(let k=0;k<6;k++){const x=d.x+500+k*90;for(const o of[8,10.5,13])along(x,80,o,0.5,0.06,METAL,40);}
+      for(let k=0;k<5;k++){const x=d.x+300+k*220,o=(k%2?1:-1)*(32+R()*10);const[a,b,c2,t]=at(x,o,0);const h=8+R()*8;const bd=new THREE.Mesh(new THREE.BoxGeometry(14,h,12),lam([0xd9c7a5,0xb0805a,0xe6e0d0][k%3]));bd.position.set(a,b+h/2-0.3,c2);bd.rotation.y=-t;group.add(bd);
+        const rf=new THREE.Mesh(new THREE.ConeGeometry(11,4,4),lam(0x5a4a42));rf.position.set(a,b+h+1.7,c2);rf.rotation.y=-t+Math.PI/4;group.add(rf);}
+      const ls=box(10,5,8,lam(0x4a5a6a),d.x+800,18,2.5);}
+  }
+}
 // ================= Sarah 3D model (for replays) =================
 function makeRider(){const g=new THREE.Group();const bike=new THREE.Group();g.add(bike);
   const wG=new THREE.TorusGeometry(0.36,0.06,6,16);const w1=new THREE.Mesh(wG,MAT.black),w2=new THREE.Mesh(wG,MAT.black);w1.position.set(-0.6,0.36,0);w2.position.set(0.62,0.36,0);bike.add(w1,w2);
@@ -406,6 +496,8 @@ function frame(now){const dt=Math.max(0,Math.min(0.05,(now-last)/1000));last=now
   pov.visible=ride;liftBar.visible=inLift;lift.visible=inLift||state=='title';if(trail)trail.group.visible=!inLift;if(!(state=='replay'))riderM.visible=false;
   if(inLift)camLift();else if(ride)camPOV(dt);else if(state=='replay')camReplay();else if(state=='title'){liftT+=dt;if(!liftLeg)liftLeg={lifts:['Fitzsimmons Express'],dur:7};camLift();lift.visible=true;}else camSelect(now);
   mtns.position.set(camera.position.x,0,camera.position.z);
+  {let dark=0;if(trail&&TR.look=='aline'&&(ride||state=='replay')){const fe=(deco.find(d=>d.t=='forestEnd')||{x:1e9}).x;const sx=state=='replay'?replay.f[Math.min(replay.f.length-1,Math.floor(replay.i))][0]:p.x;dark=Math.max(0,Math.min(1,(fe-sx)/300));}
+   hemi.intensity=1.6-dark*0.55;sun.intensity=1.6-dark*0.5;scene.fog.color.setRGB(0.61-dark*0.3,0.78-dark*0.33,0.92-dark*0.4);scene.fog.near=60-dark*35;scene.fog.far=420-dark*250;}
   if(ride&&(hudT-=dt)<0){hud();hudT=0.1;}
   renderer.render(scene,camera);requestAnimationFrame(frame);}
 // ================= Input =================
@@ -427,6 +519,6 @@ tapBtn('tilt',()=>{const en=()=>{tiltOn=!tiltOn;$('tilt').style.background=tiltO
 addEventListener('deviceorientation',e=>{if(!tiltOn)return;const land=Math.abs(window.orientation||0)==90||innerWidth>innerHeight;let v=land?(e.beta||0)*(window.orientation==-90?-1:1):(e.gamma||0);tiltSteer=Math.max(-1,Math.min(1,v/25));});
 // ================= Boot =================
 $('loading').style.display='none';buildTrail3D(TRAILS[4]);reset(0);setState('title');requestAnimationFrame(frame);
-window.__game={TRAILS,pickTrail,startPress,keys,get state(){return state},get p(){return p},get crashes(){return crashes},get score(){return score},get TR(){return TR},get FINISH(){return FINISH},get fps(){return fps},startReplay:()=>startReplay(frames,'done'),get frames(){return frames}};
+window.__game={warp:x=>reset(x),deco,TRAILS,pickTrail,startPress,keys,get state(){return state},get p(){return p},get crashes(){return crashes},get score(){return score},get TR(){return TR},get FINISH(){return FINISH},get fps(){return fps},startReplay:()=>startReplay(frames,'done'),get frames(){return frames}};
 
 </script></body></html>
